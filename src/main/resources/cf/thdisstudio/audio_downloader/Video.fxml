@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<?import javafx.scene.control.Label?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="402.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cf.thdisstudio.audio_downloader.Video">
+   <children>
+      <ImageView fx:id="thum" fitHeight="99.0" fitWidth="99.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" />
+      <Label fx:id="label_author" layoutX="118.0" layoutY="86.0" text="Author">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="label_title" layoutX="125.0" layoutY="57.0" text="Title">
+         <font>
+            <Font name="System Bold" size="40.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
