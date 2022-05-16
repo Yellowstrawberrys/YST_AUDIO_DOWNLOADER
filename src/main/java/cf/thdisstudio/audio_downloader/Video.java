@@ -8,9 +8,13 @@ import com.github.kiulian.downloader.downloader.request.RequestVideoInfo;
 import com.github.kiulian.downloader.downloader.response.Response;
 import com.github.kiulian.downloader.model.videos.VideoInfo;
 import com.github.kiulian.downloader.model.videos.formats.Format;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.MultimediaObject;
@@ -20,6 +24,7 @@ import ws.schild.jave.encode.EncodingAttributes;
 import java.io.File;
 import java.io.IOException;
 
+import static cf.thdisstudio.audio_downloader.AudioDownloaderApplication.audioPlayerManager;
 import static cf.thdisstudio.audio_downloader.AudioDownloaderApplication.downloadFolder;
 
 public class Video {
@@ -38,7 +43,7 @@ public class Video {
     public String id;
     public String videoURL;
     public String uploader;
-    public String thumbnail;
+    public Image thumbnail;
     public File target;
 
     public String status;
@@ -48,27 +53,34 @@ public class Video {
     double beforeHeight = 0;
 
     public void init() throws IOException {
-        ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).playlistPanel.heightProperty().addListener((ovl, old, newVal) -> {
-            double height = ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).playlistPanel.getHeight();
-            thum.setFitHeight(height-20);
-            thum.setFitWidth(height-20);
-            thum.setX(10);
-            if(beforeHeight * 0.1 != height * 0.1) {
-                beforeHeight = height;
-                label_title.setStyle("-fx-font: " + ((int) (height * 0.1)) + " \"Noirden Bold\";");
-                label_author.setStyle("-fx-font: " + ((int) (height * 0.05)) + " \"Noirden Bold\";");
-            }
-        });
+        label_title.setStyle("-fx-font: 18 \"Noirden Bold\";");
+        label_title.setLayoutX(54);
+        label_title.setLayoutY(10);
+        label_author.setStyle("-fx-font: 8 \"Noirden Bold\";");
+        label_author.setLayoutX(53);
+        label_author.setLayoutY(30);
+        thum.setFitHeight(40);
+        thum.setFitWidth(40);
+        thum.setLayoutX(10);
         loader = new Loader();
         info = loader.getVideoInfo(videoURL.split("\\?v=")[1]);
         title = info.details().title();
         videoURL = "https://youtube.com/watch?v="+info.details().videoId();
         uploader = info.details().author();
-        thumbnail = info.details().thumbnails().get(0);
         id = info.details().videoId();
-        target = new File(downloadFolder+"/"+title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_")+".mp3");
+        thumbnail = new Image(String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", id));
+        label_title.setText(title);
+        label_author.setText(uploader);
+        thum.setImage(new WritableImage(thumbnail.getPixelReader(), (int) (thumbnail.getWidth()/4), 0, (int) thumbnail.getHeight(), (int) thumbnail.getHeight()));
+        target = new File(downloadFolder+"/"+title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_")+".m4a");
         System.out.println("Finished Loading Things");
         loader.start();
+    }
+
+    public void onMouseClicked(){
+        if(!loader.disabled){
+            audioPlayerManager.play(this);
+        }
     }
 
     int width = 0;
@@ -107,8 +119,8 @@ public class Video {
                     Response<File> response = downloader.downloadVideoFile(request);
                     File data = response.data(); // will block current thread
                     //convert();
-                }else
-                    disabled = false;
+                }
+                disabled = false;
             }catch (Exception e){
                 e.printStackTrace();
             }

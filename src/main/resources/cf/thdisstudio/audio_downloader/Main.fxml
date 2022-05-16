@@ -9,7 +9,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
 <SplitPane dividerPositions="0.255182625863771" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="678.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cf.thdisstudio.audio_downloader.MainController">
   <items>
@@ -22,7 +21,7 @@
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="urlBar" layoutY="33.0" prefHeight="25.0" prefWidth="171.0" style="-fx-border-radius: 0; -fx-background-radius: 0; -fx-border-width: 0;" />
+                  <TextField fx:id="urlBar" layoutY="33.0" onAction="#add" prefHeight="25.0" prefWidth="171.0" style="-fx-border-radius: 0; -fx-background-radius: 0; -fx-border-width: 0;" />
                   <ScrollPane fx:id="playListDisplay" layoutY="58.0" prefHeight="140.0" prefWidth="171.0" />
                </children>
             </AnchorPane>
@@ -42,16 +41,16 @@
     <AnchorPane fx:id="PlayerPanel" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="505.0" style="-fx-background-color: black;">
          <children>
             <ImageView fx:id="background_img" fitHeight="400.0" fitWidth="500.0" pickOnBounds="true" preserveRatio="true" />
-            <Text fx:id="label_title" fill="WHITE" layoutX="186.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0" text="N/A">
+            <Label fx:id="label_title" layoutX="181.0" layoutY="159.0" text="N/A" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="54.0" />
                </font>
-            </Text>
-            <Text fx:id="label_author" fill="WHITE" layoutX="186.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="By Someone">
+            </Label>
+            <Label fx:id="label_author" layoutX="173.0" layoutY="233.0" text="By Someone" textFill="WHITE">
                <font>
                   <Font size="17.0" />
                </font>
-            </Text>
+            </Label>
             <ImageView fx:id="img_thum" fitHeight="140.0" fitWidth="140.0" layoutX="26.0" layoutY="136.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../../../../../../../Desktop/Web%201920%20–%201.png" />

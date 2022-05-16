@@ -13,6 +13,7 @@ public class AudioDownloaderApplication extends Application {
     public static File tmp = new File(System.getProperty("java.io.tmpdir")+"/audioDownloader");
     public static File downloadFolder = new File(System.getProperty("user.home")+"/audioDownloader/");
     public static FXMLLoader fxmlLoader = new FXMLLoader(AudioDownloaderApplication.class.getResource("Main.fxml"));
+    public static AudioPlayerManager audioPlayerManager = new AudioPlayerManager();
 
     @Override
     public void start(Stage stage) throws IOException {
