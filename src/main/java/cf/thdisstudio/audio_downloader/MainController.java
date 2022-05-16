@@ -42,7 +42,7 @@ public class MainController {
         playlistPanel.getChildren().add(fxmlLoader.load());
         ((Video) fxmlLoader.getController()).videoURL = "https://www.youtube.com/watch?v=jNQXAC9IVRw";
         ((Video) fxmlLoader.getController()).init();
-        new AudioPlayerManager().play("file:///Users/Yellowstrawberry/audioDownloader/NoMorE.mp3");
+        //new AudioPlayerManager().play("file:///Users/Yellowstrawberry/audioDownloader/NoMorE.mp3");
         background_img.setPreserveRatio(true);
         urlBar.setLayoutX(0);
         PlayerPanel.widthProperty().addListener((obs, oldVal, newVal) -> {

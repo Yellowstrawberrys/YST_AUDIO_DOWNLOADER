@@ -1,38 +1,24 @@
 package cf.thdisstudio.audio_downloader;
 
-import cf.ystapi.util.JsonReader;
 import com.github.kiulian.downloader.YoutubeDownloader;
 import com.github.kiulian.downloader.downloader.YoutubeCallback;
 import com.github.kiulian.downloader.downloader.YoutubeProgressCallback;
 import com.github.kiulian.downloader.downloader.request.RequestVideoFileDownload;
 import com.github.kiulian.downloader.downloader.request.RequestVideoInfo;
-import com.github.kiulian.downloader.downloader.request.RequestVideoStreamDownload;
 import com.github.kiulian.downloader.downloader.response.Response;
 import com.github.kiulian.downloader.model.videos.VideoInfo;
-import com.github.kiulian.downloader.model.videos.formats.AudioFormat;
 import com.github.kiulian.downloader.model.videos.formats.Format;
-import com.github.kiulian.downloader.model.videos.formats.VideoFormat;
-import com.github.kiulian.downloader.model.videos.formats.VideoWithAudioFormat;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import org.json.JSONObject;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.MultimediaObject;
 import ws.schild.jave.encode.AudioAttributes;
 import ws.schild.jave.encode.EncodingAttributes;
 
-import javax.swing.*;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static cf.thdisstudio.audio_downloader.AudioDownloaderApplication.downloadFolder;
 
@@ -42,9 +28,10 @@ public class Video {
     public Label label_title;
     @FXML
     public Label label_author;
-
     @FXML
     public ImageView thum;
+    @FXML
+    public AnchorPane main;
 
     public VideoInfo info;
     public String title;
@@ -58,9 +45,20 @@ public class Video {
     Loader loader;
     YoutubeDownloader downloader = new YoutubeDownloader();
 
+    double beforeHeight = 0;
+
     public void init() throws IOException {
-        label_title.setText("Test");
-        label_author.setText("test");
+        ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).playlistPanel.heightProperty().addListener((ovl, old, newVal) -> {
+            double height = ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).playlistPanel.getHeight();
+            thum.setFitHeight(height-20);
+            thum.setFitWidth(height-20);
+            thum.setX(10);
+            if(beforeHeight * 0.1 != height * 0.1) {
+                beforeHeight = height;
+                label_title.setStyle("-fx-font: " + ((int) (height * 0.1)) + " \"Noirden Bold\";");
+                label_author.setStyle("-fx-font: " + ((int) (height * 0.05)) + " \"Noirden Bold\";");
+            }
+        });
         loader = new Loader();
         info = loader.getVideoInfo(videoURL.split("\\?v=")[1]);
         title = info.details().title();
@@ -68,7 +66,7 @@ public class Video {
         uploader = info.details().author();
         thumbnail = info.details().thumbnails().get(0);
         id = info.details().videoId();
-        target = new File(downloadFolder+"/"+title+".mp3");
+        target = new File(downloadFolder+"/"+title.replaceAll("[^a-zA-Z0-9\\.\\-]", "_")+".mp3");
         System.out.println("Finished Loading Things");
         loader.start();
     }
