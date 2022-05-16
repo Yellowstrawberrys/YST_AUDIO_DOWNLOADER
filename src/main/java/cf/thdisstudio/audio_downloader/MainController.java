@@ -5,13 +5,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.IOException;
 
@@ -46,10 +45,16 @@ public class MainController {
     @FXML
     public ScrollPane playListDisplay;
 
+    @FXML
+    public Button button_audioTool;
+
+    @FXML
+    public ImageView image_audioTool;
+
     HBox hBox = new HBox();
 
     @FXML
-    public void initialize() throws IOException {
+    public void initialize() {
         background_img.setPreserveRatio(false);
         urlBar.setLayoutX(0);
         background_img.fitWidthProperty().bind(PlayerPanel.widthProperty());
@@ -58,10 +63,11 @@ public class MainController {
         PlayerPanel.widthProperty().addListener((obs, oldVal, newVal) -> {
             playBar.setPrefSize(PlayerPanel.getWidth()-100, 10);
             playBar.setLayoutX(50);
-            label_current.setLayoutX(35);
+            label_current.setLayoutX(40);
             label_end.setLayoutX(PlayerPanel.getWidth()-65);
             urlBar.setPrefSize(playlistPanel.getWidth(), 25);
             playListDisplay.setPrefSize(playlistPanel.getWidth(), playlistPanel.getHeight());
+            button_audioTool.setLayoutX((PlayerPanel.getWidth()-button_audioTool.getPrefWidth())/2);
         });
 
         playlistPanel.heightProperty().addListener((obs, oldVal, newVal) -> {
@@ -72,6 +78,15 @@ public class MainController {
             if(playBar.isValueChanging() && AudioDownloaderApplication.audioPlayerManager.mediaPlayer != null)
                 AudioDownloaderApplication.audioPlayerManager.set(playBar.getValue()/100);
         });
+//        image_audioTool.fitHeightProperty().bind(button_audioTool.heightProperty());
+//        image_audioTool.fitWidthProperty().bind(button_audioTool.widthProperty());
+    }
+
+    public void onClickControlButton(){
+        if(AudioDownloaderApplication.audioPlayerManager.mediaPlayer != null && AudioDownloaderApplication.audioPlayerManager.mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING))
+            AudioDownloaderApplication.audioPlayerManager.pause();
+        else if(AudioDownloaderApplication.audioPlayerManager.mediaPlayer != null && AudioDownloaderApplication.audioPlayerManager.mediaPlayer.getStatus().equals(MediaPlayer.Status.PAUSED))
+            AudioDownloaderApplication.audioPlayerManager.play();
     }
 
     public void add() throws IOException {

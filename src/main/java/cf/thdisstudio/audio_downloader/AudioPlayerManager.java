@@ -1,6 +1,7 @@
 package cf.thdisstudio.audio_downloader;
 
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -19,6 +20,7 @@ public class AudioPlayerManager {
         mediaPlayer = new MediaPlayer(new Media(video.target.toURI().toString()));
         MainController mainController = AudioDownloaderApplication.fxmlLoader.getController();
         mainController.background_img.setImage(video.thumbnail);
+        mainController.image_audioTool.setImage(new Image(AudioDownloaderApplication.class.getResourceAsStream("img/Pause_Button.png")));
         ColorAdjust colorAdjust = new ColorAdjust();
         colorAdjust.setBrightness(-0.7);
         mainController.background_img.setEffect(colorAdjust);
@@ -53,6 +55,7 @@ public class AudioPlayerManager {
     }
 
     public void pause(){
+        ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).image_audioTool.setImage(new Image(AudioDownloaderApplication.class.getResourceAsStream("img/Play_Button.png")));
         mediaPlayer.pause();
     }
 
