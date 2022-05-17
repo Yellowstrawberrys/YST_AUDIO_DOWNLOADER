@@ -18,7 +18,7 @@ public class AudioDownloaderApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Scene scene = new Scene(fxmlLoader.load(), 678, 400);
-        stage.setTitle("YST Audio Downloader");
+        stage.setTitle("YSMD");
         stage.setScene(scene);
         stage.show();
     }
