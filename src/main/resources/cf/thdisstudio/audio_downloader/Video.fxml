@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -18,5 +19,6 @@
             <Font size="40.0" />
          </font>
       </Label>
+      <ProgressBar fx:id="downloadProgressBar" prefHeight="110.0" prefWidth="402.0" progress="1.0" />
    </children>
 </AnchorPane>

@@ -5,3 +5,16 @@
 .split-pane > .split-pane-divider {
     -fx-padding: 0 0.1em 0 0.1em;
 }
+
+.progress-bar > .track {
+    -fx-text-box-border: rgba(0,0,0,0);
+    -fx-control-inner-background: rgba(0,0,0,0);
+    -fx-background-color: rgba(0, 0, 0, 0);
+}
+
+.progress-bar .bar {
+    -fx-border-color: none;
+    -fx-padding: 1px;
+    -fx-background-insets: 0;
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+}

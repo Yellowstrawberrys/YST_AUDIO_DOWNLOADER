@@ -13,7 +13,7 @@ public class AudioPlayerManager {
     public Video video;
     MediaPlayer mediaPlayer;
 
-    public void play(Video video){
+    public void play(Video video) throws Exception{
         this.video = video;
         if(mediaPlayer != null && mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING))
             mediaPlayer.dispose();
@@ -51,6 +51,8 @@ public class AudioPlayerManager {
     }
 
     public void play(){
+        MainController mainController = AudioDownloaderApplication.fxmlLoader.getController();
+        mainController.image_audioTool.setImage(new Image(AudioDownloaderApplication.class.getResourceAsStream("img/Pause_Button.png")));
         mediaPlayer.play();
     }
 

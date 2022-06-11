@@ -1,20 +1,20 @@
 package cf.thdisstudio.audio_downloader;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.media.MediaPlayer;
 
 import java.io.IOException;
 
 public class MainController {
+
+    @FXML
+    public SplitPane mainpane;
     @FXML
     public Slider playBar;
 
@@ -51,7 +51,7 @@ public class MainController {
     @FXML
     public ImageView image_audioTool;
 
-    HBox hBox = new HBox();
+    final FlowPane hBox = new FlowPane();
 
     @FXML
     public void initialize() {
@@ -60,6 +60,8 @@ public class MainController {
         background_img.fitWidthProperty().bind(PlayerPanel.widthProperty());
         background_img.fitHeightProperty().bind(PlayerPanel.heightProperty());
         playListDisplay.setContent(hBox);
+        playListDisplay.setFitToWidth(true);
+        playListDisplay.setPannable(true);
         PlayerPanel.widthProperty().addListener((obs, oldVal, newVal) -> {
             playBar.setPrefSize(PlayerPanel.getWidth()-100, 10);
             playBar.setLayoutX(50);
@@ -71,7 +73,13 @@ public class MainController {
         });
 
         playlistPanel.heightProperty().addListener((obs, oldVal, newVal) -> {
-            playListDisplay.setPrefSize(playlistPanel.getWidth(), playlistPanel.getHeight());
+            playListDisplay.setPrefHeight(playlistPanel.getHeight()-63);
+            hBox.setPrefHeight(playlistPanel.getHeight()-63);
+        });
+
+        playlistPanel.widthProperty().addListener((obs, oldVal, newVal) -> {
+            playListDisplay.setPrefWidth(playlistPanel.getWidth());
+            hBox.setPrefWidth(playlistPanel.getWidth());
         });
 
         playBar.valueProperty().addListener((observableValue, oldValue, newValue) -> {
@@ -91,9 +99,14 @@ public class MainController {
 
     public void add() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(AudioDownloaderApplication.class.getResource("Video.fxml"));
-        hBox.getChildren().add(fxmlLoader.load());
+        Node node = fxmlLoader.load();
+        hBox.getChildren().add(node);
         ((Video) fxmlLoader.getController()).videoURL = urlBar.getText();
         urlBar.setText("");
-        ((Video) fxmlLoader.getController()).init();
+        try {
+            ((Video) fxmlLoader.getController()).init();
+        }catch (ArrayIndexOutOfBoundsException e){
+            hBox.getChildren().remove(node);
+        }
     }
 }
