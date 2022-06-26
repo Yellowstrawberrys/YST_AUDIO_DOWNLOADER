@@ -13,15 +13,25 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import static cf.thdisstudio.audio_downloader.AudioDownloaderApplication.audioPlayerManager;
 import static cf.thdisstudio.audio_downloader.AudioDownloaderApplication.downloadFolder;
@@ -46,14 +56,14 @@ public class Video {
     public String uploader;
     public Image thumbnail;
     public File target;
-
     public String status;
+    public Node current;
     Loader loader;
     YoutubeDownloader downloader = new YoutubeDownloader();
 
     double beforeHeight = 0;
 
-    public void init() throws ArrayIndexOutOfBoundsException {
+    public void init(boolean isLocal) throws ArrayIndexOutOfBoundsException, IOException, SQLException {
         label_title.setStyle("-fx-font: 18 \"Noirden Bold\";");
         label_title.setLayoutX(54);
         label_title.setLayoutY(10);
@@ -72,16 +82,24 @@ public class Video {
         });
         downloadProgressBar.setPrefSize(403, 50);
         loader = new Loader();
-        info = loader.getVideoInfo(videoURL.split("\\?v=")[1]);
-        title = info.details().title();
-        uploader = info.details().author();
-        id = info.details().videoId();
-        thumbnail = new Image(String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", id));
-        label_title.setText(title);
-        label_author.setText(uploader);
-        thum.setImage(new WritableImage(thumbnail.getPixelReader(), (int) (thumbnail.getWidth()/4), 0, (int) thumbnail.getHeight(), (int) thumbnail.getHeight()));
-        target = new File(downloadFolder+"/"+title.replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\s", "_")+".m4a");
-        loader.start();
+        if (!isLocal) {
+            info = loader.getVideoInfo(videoURL.split("\\?v=")[1]);
+            title = info.details().title();
+            target = new File(downloadFolder+"/"+title.replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\s", "_")+".m4a");
+            uploader = info.details().author();
+            id = info.details().videoId();
+            thumbnail = new Image(String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", id));
+            update();
+            thumbnail();
+            loader.start();
+            AudioDownloaderApplication.addVideo(target, id, title, uploader,"https://youtube.com/watch?v="+id);
+        }else {
+            target = new File(downloadFolder+"/"+title.replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\s", "_")+".m4a");
+            thumbnail = new Image(new File(AudioDownloaderApplication.caches + "/" + id + ".png").toURI().toString());
+            thumbnail();
+            update();
+            loader.loadFin();
+        }
     }
 
     public void onMouseClicked(){
@@ -94,6 +112,28 @@ public class Video {
                 loader.start();
             }
         }
+    }
+
+    public void update(){
+        label_title.setText(title);
+        label_author.setText(uploader);
+        thum.setImage(new WritableImage(thumbnail.getPixelReader(), (int) (thumbnail.getWidth()/4), 0, (int) thumbnail.getHeight(), (int) thumbnail.getHeight()));
+    }
+
+    public void thumbnail() {
+        new Thread(() -> {
+            try {
+                if (!new File(AudioDownloaderApplication.caches + "/" + id + ".png").exists()) {
+                    InputStream in = new URL(String.format("https://i.ytimg.com/vi/%s/hqdefault.jpg", id)).openStream();
+                    try {
+                        Files.copy(in, Paths.get(AudioDownloaderApplication.caches + "/" + id + ".png"));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                thumbnail = new Image(AudioDownloaderApplication.caches + "/" + id + ".png");
+            }catch (Exception e){}
+        }).start();
     }
 
     int width = 0;
@@ -109,6 +149,8 @@ public class Video {
                 if(!target.exists() || bypass) {
                     status = "Downloading";
                     File outputDir = new File(downloadFolder+"/");
+                    if(info == null)
+                        info = loader.getVideoInfo(videoURL.split("\\?v=")[1]);
                     Format format = info.bestAudioFormat();
                     RequestVideoFileDownload request = new RequestVideoFileDownload(format)
                             .saveTo(outputDir)
@@ -116,7 +158,6 @@ public class Video {
                             .callback(new YoutubeProgressCallback<>() {
                                 @Override
                                 public void onDownloading(int progress) {
-                                    System.out.printf("Downloaded %d%%\n", progress);
                                     Platform.runLater(() -> {
                                         label_author.setText("Downloading... (%s%%)".formatted(progress));
                                         downloadProgressBar.setProgress(1d-(((double) progress)/100d));
@@ -125,9 +166,7 @@ public class Video {
 
                                 @Override
                                 public void onFinished(File videoInfo) {
-                                    System.out.println("Finished file: " + videoInfo);
                                     Platform.runLater(() -> label_author.setText(uploader));
-
                                 }
 
                                 @Override
@@ -140,8 +179,7 @@ public class Video {
                     File data = response.data(); // will block current thread
                     //convert();
                 }
-                disabled = false;
-                downloadProgressBar.setVisible(false);
+                loadFin();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -165,6 +203,25 @@ public class Video {
                     .async();
             Response<VideoInfo> response = downloader.getVideoInfo(request);
             return response.data();
+        }
+
+        public void loadFin(){
+            disabled = false;
+            downloadProgressBar.setVisible(false);
+            main.setOnDragDetected(event -> {
+                Dragboard db = main.startDragAndDrop(TransferMode.ANY);
+                ClipboardContent content = new ClipboardContent();
+                content.putFiles(List.of(target));
+                db.setContent(content);
+                event.consume();
+            });
+            main.setOnDragDone(event -> {
+                if (event.getTransferMode() == TransferMode.MOVE) {
+                    ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).hBox.getChildren().remove(current);
+                    ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).urls.remove(videoURL);
+                }
+                event.consume();
+            });
         }
     }
 }

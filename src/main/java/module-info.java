@@ -7,6 +7,7 @@ module cf.thdisstudio.audio_downloader {
     requires javafx.media;
     requires javafx.controls;
     requires java.youtube.downloader;
+    requires org.json;
 
     exports cf.thdisstudio.audio_downloader;
     opens cf.thdisstudio.audio_downloader to javafx.graphics;
