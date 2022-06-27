@@ -152,6 +152,7 @@ public class MainController {
     }
 
     public void add() throws IOException {
+        System.gc();
         if(!urls.contains(urlBar.getText())) {
             FXMLLoader fxmlLoader = new FXMLLoader(AudioDownloaderApplication.class.getResource("Video.fxml"));
             Node node = fxmlLoader.load();

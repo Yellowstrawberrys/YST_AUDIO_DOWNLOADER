@@ -22,6 +22,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.File;
 import java.io.IOException;
@@ -209,6 +210,8 @@ public class Video {
             disabled = false;
             downloadProgressBar.setVisible(false);
             main.setOnDragDetected(event -> {
+                if(audioPlayerManager.mediaPlayer != null)
+                    audioPlayerManager.mediaPlayer.dispose();
                 Dragboard db = main.startDragAndDrop(TransferMode.ANY);
                 ClipboardContent content = new ClipboardContent();
                 content.putFiles(List.of(target));
@@ -217,8 +220,15 @@ public class Video {
             });
             main.setOnDragDone(event -> {
                 if (event.getTransferMode() == TransferMode.MOVE) {
+                    loader.stop();
                     ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).hBox.getChildren().remove(current);
                     ((MainController) AudioDownloaderApplication.fxmlLoader.getController()).urls.remove(videoURL);
+                    try {
+                        AudioDownloaderApplication.conn.createStatement().execute("DELETE FROM videos WHERE url='"+videoURL+"';");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.gc();
                 }
                 event.consume();
             });
